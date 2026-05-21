@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Study Schedule Tracker</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="shell">
+    <div class="app" id="app">
+      <header class="top-header">
+        <div class="top-header__text">
+          <h1 class="app-title">Study Schedule Tracker</h1>
+          <p class="app-subtitle">Daily goal: 10 study hours</p>
+        </div>
+        <label class="date-pill" aria-label="Pick date">
+          <span class="date-pill__icon" aria-hidden="true">📅</span>
+          <input type="date" id="planDate" class="date-pill__input" />
+        </label>
+      </header>
+
+      <p class="date-line" id="dateLine"></p>
+
+      <section class="alert-banner" id="hoursAlert" hidden></section>
+
+      <main class="main-flow">
+        <!-- Dashboard -->
+        <section id="tab-dashboard" class="tab-panel" role="tabpanel" aria-labelledby="tab-btn-dashboard">
+          <article class="card card--hero">
+            <div class="hero-progress">
+              <div class="hero-progress__text">
+                <p class="hero-progress__label" id="heroHoursLabel">0 / 10 hours completed</p>
+                <p class="hero-progress__remain" id="heroRemainLabel">10 hours remaining</p>
+                <div class="bar-track" aria-hidden="true">
+                  <div class="bar-fill bar-fill--primary" id="heroBar"></div>
+                </div>
+              </div>
+              <div class="ring-wrap" aria-label="Day completion">
+                <svg class="ring" viewBox="0 0 80 80" width="80" height="80">
+                  <circle class="ring__bg" cx="40" cy="40" r="34" fill="none" stroke-width="8" />
+                  <circle class="ring__fg" id="ringFg" cx="40" cy="40" r="34" fill="none" stroke-width="8" stroke-linecap="round" transform="rotate(-90 40 40)" />
+                </svg>
+                <span class="ring__pct" id="ringPct">0%</span>
+              </div>
+            </div>
+          </article>
+
+          <div class="summary-grid">
+            <article class="card card--summary">
+              <h2 class="card-title">Parent summary</h2>
+              <ul class="summary-list">
+                <li><span class="dot dot--green"></span> <span id="sumCompleted">0 h</span> <span class="muted">Completed</span></li>
+                <li><span class="dot dot--orange"></span> <span id="sumRemaining">10 h</span> <span class="muted">Remaining</span></li>
+                <li><span class="dot dot--purple"></span> <span id="sumCompulsory">0 / 0</span> <span class="muted">Compulsory blocks done</span></li>
+              </ul>
+              <p class="motivate" id="motivateLine">Add courses to build today’s plan.</p>
+            </article>
+            <article class="card card--summary">
+              <h2 class="card-title">Study balance (today)</h2>
+              <div class="balance-row">
+                <span>Focus balance</span>
+                <span class="tag tag--good" id="focusTag">Good</span>
+              </div>
+              <div class="bar-track bar-track--thin"><div class="bar-fill bar-fill--green" id="focusBar"></div></div>
+              <div class="balance-row">
+                <span>Break balance</span>
+                <span class="tag tag--good" id="breakTag">Good</span>
+              </div>
+              <div class="bar-track bar-track--thin"><div class="bar-fill bar-fill--teal" id="breakBar"></div></div>
+              <p class="tip-box" id="balanceTip">Build your schedule, then check off blocks as you go.</p>
+            </article>
+          </div>
+
+          <article class="card">
+            <div class="section-head">
+              <h2 class="card-title card-title--inline" id="scheduleHead">Today’s schedule</h2>
+              <span class="linkish" id="scheduleTotal"></span>
+            </div>
+            <ul class="schedule-list" id="scheduleList"></ul>
+            <p class="empty-state" id="emptySchedule" hidden>No courses yet — open “Manage courses” below.</p>
+          </article>
+
+          <div class="stats-grid">
+            <article class="card">
+              <h2 class="card-title">Weekly consistency</h2>
+              <p class="big-stat"><span id="weekPct">0</span>%</p>
+              <div class="week-bars" id="weekBars" aria-label="Last seven days"></div>
+            </article>
+            <article class="card">
+              <h2 class="card-title">Study streak</h2>
+              <p class="streak"><span class="streak__icon" aria-hidden="true">🔥</span> <span id="streakDays">0</span> days</p>
+              <h2 class="card-title card-title--spaced">Next reminder</h2>
+              <div class="reminder" id="nextReminder">
+                <span class="reminder__bell" aria-hidden="true">🔔</span>
+                <span id="nextReminderText">—</span>
+              </div>
+            </article>
+          </div>
+
+          <details class="manage" id="manageCourses">
+            <summary>Manage courses &amp; start time</summary>
+            <div class="manage__body">
+              <label class="field">
+                <span class="field__label">Day starts at</span>
+                <input type="time" id="dayStart" value="06:00" />
+              </label>
+              <p class="hint">Sessions stack from this time for the list view.</p>
+              <form class="add-course" id="addCourseForm">
+                <input type="text" id="newCourseName" placeholder="Course name" required maxlength="80" />
+                <input type="number" id="newCourseMinutes" placeholder="Min/day" min="15" max="480" value="90" required />
+                <label class="chk"><input type="checkbox" id="newCourseCompulsory" checked /> Compulsory</label>
+                <button type="submit" class="btn btn--primary">Add</button>
+              </form>
+              <div class="table-wrap">
+                <table class="course-table">
+                  <thead>
+                    <tr>
+                      <th>Course</th>
+                      <th>Min</th>
+                      <th>Req</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="courseTableBody"></tbody>
+                </table>
+              </div>
+              <p class="hint">Drag ⠿ to reorder. Aim for ≥ 600 min (10 h) per day.</p>
+            </div>
+          </details>
+        </section>
+
+        <!-- Check-in -->
+        <section id="tab-checkin" class="tab-panel" role="tabpanel" hidden aria-labelledby="tab-btn-checkin">
+          <div class="checkin-toolbar">
+            <button type="button" class="btn btn--ghost" id="btnResetDay">Clear day</button>
+            <button type="button" class="btn btn--secondary" id="btnMarkAll">Mark all done</button>
+          </div>
+          <ul class="checkin-list" id="checkinList"></ul>
+          <p class="empty-state" id="emptyCheckin" hidden>No sessions for this day.</p>
+        </section>
+      </main>
+
+      <nav class="bottom-nav" role="tablist" aria-label="Main">
+        <button type="button" class="bottom-nav__btn active" id="tab-btn-dashboard" data-tab="dashboard" role="tab" aria-selected="true">
+          <span class="bottom-nav__icon" aria-hidden="true">◉</span>
+          Dashboard
+        </button>
+        <button type="button" class="bottom-nav__btn" id="tab-btn-checkin" data-tab="checkin" role="tab" aria-selected="false">
+          <span class="bottom-nav__icon" aria-hidden="true">✓</span>
+          Check-in
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <footer class="page-footer">Saved on this device only (local storage).</footer>
+  <script src="app.js"></script>
+</body>
+</html>
